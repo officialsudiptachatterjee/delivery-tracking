@@ -1,58 +1,18 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Delivery Tracking</title>
-  <link rel="stylesheet" href="assets/style.css">
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js"></script>
-  <script src="assets/app.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DANNAND Delivery Tracking</title>
+  <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
-  <div class="container">
-    <h1>Track Your Delivery</h1>
-    <input type="text" id="trackingCode" placeholder="Enter Code (DANNAND...)">
-    <button onclick="trackDelivery()">Track</button>
-    <div id="result"></div>
-  </div>
+  <h1>📦 DANNAND Delivery Tracking</h1>
+  <input id="codeInput" placeholder="Enter Code (e.g., DANNAND123)" />
+  <button onclick="trackDelivery()">Track</button>
+  
+  <div id="result"></div>
 
-  <script>
-    function trackDelivery() {
-      const code = document.getElementById('trackingCode').value.trim();
-      if (!code) return alert('Enter a valid tracking code');
-
-      db.collection('deliveries').doc(code).onSnapshot(doc => {
-        if (doc.exists) {
-          const data = doc.data();
-          document.getElementById('result').innerHTML = `
-            <h3>Status: ${data.status}</h3>
-            <p><strong>Name:</strong> ${data.name}</p>
-            <p><strong>Address:</strong> ${data.address}</p>
-            <p><strong>Quantity:</strong> ${data.quantity}</p>
-            <p><strong>Billing:</strong> ₹${data.billing}</p>
-            <p><strong>Type:</strong> Prepaid</p>
-            <p><strong>ETA:</strong> ${data.eta}</p>
-          `;
-        } else {
-          document.getElementById('result').innerHTML = "No delivery found.";
-        }
-      });
-    }
-
-    // Request push notifications
-    Notification.requestPermission().then(permission => {
-      if (permission === 'granted') {
-        messaging.getToken({ vapidKey }).then(token => {
-          console.log("Push Token:", token);
-          // Store token for push notifications (if needed)
-        });
-      }
-    });
-
-    messaging.onMessage(payload => {
-      alert(`Notification: ${payload.notification.title}\n${payload.notification.body}`);
-    });
-  </script>
+  <script type="module" src="assets/app.js"></script>
 </body>
 </html>
