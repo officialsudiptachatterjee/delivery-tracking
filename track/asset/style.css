@@ -1,0 +1,31 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: radial-gradient(circle at top, #4b0082, #000);
+  color: #ffd700;
+}
+
+.container {
+  max-width: 600px;
+  margin: auto;
+  padding: 20px;
+  text-align: center;
+}
+
+input, button {
+  padding: 10px;
+  margin: 10px;
+  border: none;
+  border-radius: 5px;
+}
+
+input {
+  width: 80%;
+}
+
+button {
+  background: #ffd700;
+  color: #4b0082;
+  cursor: pointer;
+  font-weight: bold;
+}
