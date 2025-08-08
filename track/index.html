@@ -1,98 +1,58 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DANNAND Delivery Tracker</title>
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    background: linear-gradient(to right, #6a11cb, #2575fc);
-    color: white;
-    text-align: center;
-    padding: 30px;
-  }
-  input {
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    margin-top: 10px;
-    width: 250px;
-  }
-  button {
-    padding: 10px 20px;
-    background: gold;
-    border: none;
-    border-radius: 5px;
-    margin-left: 5px;
-    cursor: pointer;
-    font-weight: bold;
-  }
-  .card {
-    background: rgba(0, 0, 0, 0.4);
-    padding: 15px;
-    margin-top: 20px;
-    border-radius: 10px;
-    display: inline-block;
-    min-width: 300px;
-  }
-</style>
+  <meta charset="UTF-8">
+  <title>Delivery Tracking</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js"></script>
+  <script src="assets/app.js"></script>
 </head>
 <body>
+  <div class="container">
+    <h1>Track Your Delivery</h1>
+    <input type="text" id="trackingCode" placeholder="Enter Code (DANNAND...)">
+    <button onclick="trackDelivery()">Track</button>
+    <div id="result"></div>
+  </div>
 
-<h1>📦 DANNAND Delivery Tracking</h1>
-<p>Enter your delivery code (e.g., DANNAND123)</p>
+  <script>
+    function trackDelivery() {
+      const code = document.getElementById('trackingCode').value.trim();
+      if (!code) return alert('Enter a valid tracking code');
 
-<input type="text" id="searchCode" placeholder="Enter Delivery Code">
-<button onclick="searchDelivery()">Track</button>
-
-<div id="result" class="card">
-  <p>Enter your code to see delivery details.</p>
-</div>
-
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"></script>
-
-<script>
-  // Firebase Config
-  const firebaseConfig = {
-    apiKey: "AIzaSyAcXYf4tCPSqgoetSFWM_Tle59fl6LzXv8",
-    authDomain: "dannanddelivery.firebaseapp.com",
-    projectId: "dannanddelivery",
-    storageBucket: "dannanddelivery.firebasestorage.app",
-    messagingSenderId: "126272613634",
-    appId: "1:126272613634:web:311a99b5a6f48b8671661b",
-    measurementId: "G-6EDB7ERF0C"
-  };
-
-  // Init
-  const app = firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-
-  function searchDelivery() {
-    const code = document.getElementById('searchCode').value.trim();
-    if (!code.startsWith("DANNAND")) {
-      document.getElementById('result').innerHTML = `<p>Code must start with DANNAND</p>`;
-      return;
+      db.collection('deliveries').doc(code).onSnapshot(doc => {
+        if (doc.exists) {
+          const data = doc.data();
+          document.getElementById('result').innerHTML = `
+            <h3>Status: ${data.status}</h3>
+            <p><strong>Name:</strong> ${data.name}</p>
+            <p><strong>Address:</strong> ${data.address}</p>
+            <p><strong>Quantity:</strong> ${data.quantity}</p>
+            <p><strong>Billing:</strong> ₹${data.billing}</p>
+            <p><strong>Type:</strong> Prepaid</p>
+            <p><strong>ETA:</strong> ${data.eta}</p>
+          `;
+        } else {
+          document.getElementById('result').innerHTML = "No delivery found.";
+        }
+      });
     }
-    db.collection("deliveries").doc(code).onSnapshot((doc) => {
-      if (doc.exists) {
-        const d = doc.data();
-        document.getElementById('result').innerHTML = `
-          <h3>${d.username}</h3>
-          <p>📍 ${d.address}</p>
-          <p>📦 Quantity: ${d.quantity}</p>
-          <p>💰 Billing: ₹${d.billing}</p>
-          <p>💳 Type: ${d.type}</p>
-          <p>⏳ ETA: ${d.eta}</p>
-          <p>🚚 Status: ${d.status}</p>
-        `;
-      } else {
-        document.getElementById('result').innerHTML = `<p>No delivery found.</p>`;
+
+    // Request push notifications
+    Notification.requestPermission().then(permission => {
+      if (permission === 'granted') {
+        messaging.getToken({ vapidKey }).then(token => {
+          console.log("Push Token:", token);
+          // Store token for push notifications (if needed)
+        });
       }
     });
-  }
-</script>
+
+    messaging.onMessage(payload => {
+      alert(`Notification: ${payload.notification.title}\n${payload.notification.body}`);
+    });
+  </script>
 </body>
 </html>
