@@ -1,86 +1,45 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DANNAND Delivery Admin</title>
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    background: linear-gradient(to right, #ff9966, #ff5e62);
-    color: white;
-    padding: 20px;
-    text-align: center;
-  }
-  input {
-    padding: 10px;
-    width: 250px;
-    margin: 5px;
-    border: none;
-    border-radius: 5px;
-  }
-  button {
-    padding: 10px 20px;
-    background: gold;
-    border: none;
-    border-radius: 5px;
-    font-weight: bold;
-    cursor: pointer;
-    margin-top: 10px;
-  }
-</style>
+  <meta charset="UTF-8">
+  <title>Admin Panel</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js"></script>
+  <script src="assets/app.js"></script>
 </head>
 <body>
+  <div class="container">
+    <h1>Update Delivery</h1>
+    <input type="text" id="code" placeholder="Tracking Code">
+    <input type="text" id="name" placeholder="Customer Name">
+    <input type="text" id="address" placeholder="Address">
+    <input type="number" id="quantity" placeholder="Quantity">
+    <input type="number" id="billing" placeholder="Billing ₹">
+    <input type="text" id="eta" placeholder="ETA">
+    <input type="text" id="status" placeholder="Status">
+    <button onclick="updateDelivery()">Update</button>
+  </div>
 
-<h1>🛠 DANNAND Delivery Admin</h1>
+  <script>
+    function updateDelivery() {
+      const code = document.getElementById('code').value.trim();
+      if (!code) return alert('Code required');
 
-<input type="text" id="code" placeholder="Delivery Code (DANNAND123)">
-<input type="text" id="username" placeholder="Customer Name">
-<input type="text" id="address" placeholder="Address">
-<input type="number" id="quantity" placeholder="Quantity">
-<input type="number" id="billing" placeholder="Billing ₹">
-<input type="text" id="eta" placeholder="ETA (e.g., 12 Aug)">
-<input type="text" id="status" placeholder="Status (e.g., Shipped)">
-<br>
-<button onclick="addDelivery()">Save / Update</button>
+      const delivery = {
+        name: document.getElementById('name').value,
+        address: document.getElementById('address').value,
+        quantity: parseInt(document.getElementById('quantity').value),
+        billing: parseFloat(document.getElementById('billing').value),
+        eta: document.getElementById('eta').value,
+        status: document.getElementById('status').value
+      };
 
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"></script>
-
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyAcXYf4tCPSqgoetSFWM_Tle59fl6LzXv8",
-    authDomain: "dannanddelivery.firebaseapp.com",
-    projectId: "dannanddelivery",
-    storageBucket: "dannanddelivery.firebasestorage.app",
-    messagingSenderId: "126272613634",
-    appId: "1:126272613634:web:311a99b5a6f48b8671661b",
-    measurementId: "G-6EDB7ERF0C"
-  };
-
-  const app = firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-
-  function addDelivery() {
-    const code = document.getElementById('code').value.trim();
-    if (!code.startsWith("DANNAND")) {
-      alert("Code must start with DANNAND");
-      return;
+      db.collection('deliveries').doc(code).set(delivery).then(() => {
+        alert('Delivery updated!');
+      });
     }
-    const data = {
-      username: document.getElementById('username').value,
-      address: document.getElementById('address').value,
-      quantity: document.getElementById('quantity').value,
-      billing: document.getElementById('billing').value,
-      type: "Prepaid",
-      eta: document.getElementById('eta').value,
-      status: document.getElementById('status').value
-    };
-    db.collection("deliveries").doc(code).set(data)
-      .then(() => alert("Delivery saved/updated!"))
-      .catch(err => alert("Error: " + err));
-  }
-</script>
+  </script>
 </body>
 </html>
